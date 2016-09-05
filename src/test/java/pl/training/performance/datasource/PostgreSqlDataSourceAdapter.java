@@ -1,5 +1,6 @@
 package pl.training.performance.datasource;
 
+import org.hibernate.dialect.PostgreSQL9Dialect;
 import org.postgresql.ds.PGSimpleDataSource;
 
 import javax.sql.DataSource;
@@ -27,6 +28,11 @@ public class PostgreSqlDataSourceAdapter extends DataSourceAdapter {
         Statement statement = connection.createStatement();
         statement.executeUpdate("drop table if exists post cascade");
         statement.executeUpdate("create table post (id bigint not null, title varchar(255), version integer not null, primary key (id))");
+    }
+
+    @Override
+    public String getDialect() {
+        return PostgreSQL9Dialect.class.getName();
     }
 
 }

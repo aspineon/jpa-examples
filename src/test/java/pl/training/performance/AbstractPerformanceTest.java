@@ -13,6 +13,8 @@ import pl.training.performance.datasource.DataSourceAdapter;
 import pl.training.performance.datasource.MySqlDataSourceAdapter;
 import pl.training.performance.datasource.PostgreSqlDataSourceAdapter;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,6 +52,10 @@ public abstract class AbstractPerformanceTest {
         hikariConfig.setMaximumPoolSize(maxPollSize);
         hikariConfig.setIdleTimeout(idleTimeout);
         return new HikariDataSource(hikariConfig);
+    }
+
+    public EntityManagerFactory createEntityManagerFactory() {
+        return Persistence.createEntityManagerFactory("training", dataSourceAdapter.getJpaProperties());
     }
 
 }

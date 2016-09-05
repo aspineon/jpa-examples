@@ -1,6 +1,7 @@
 package pl.training.performance.datasource;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+import org.hibernate.dialect.MySQL5Dialect;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -27,6 +28,11 @@ public class MySqlDataSourceAdapter extends DataSourceAdapter {
         Statement statement = connection.createStatement();
         statement.executeUpdate("drop table if exists post cascade");
         statement.executeUpdate("create table post (id bigint not null, title varchar(255), version integer not null, primary key (id))");
+    }
+
+    @Override
+    public String getDialect() {
+        return MySQL5Dialect.class.getName();
     }
 
 }

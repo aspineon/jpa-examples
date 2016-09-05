@@ -64,6 +64,12 @@
             <version>2.4.7</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>5.2.2.Final</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
