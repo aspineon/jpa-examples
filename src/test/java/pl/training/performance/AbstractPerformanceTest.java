@@ -33,7 +33,7 @@ public abstract class AbstractPerformanceTest {
     @Parameters
     public static Collection<DataSourceAdapter[]> dataSourceProviders() {
         List<DataSourceAdapter[]> dataSourceAdapters = new ArrayList<>();
-        dataSourceAdapters.add(new DataSourceAdapter[] { new MySqlDataSourceAdapter("root", "admin", "jdbc:mysql://localhost/test")});
+        dataSourceAdapters.add(new DataSourceAdapter[] { new MySqlDataSourceAdapter("root", "admin", "jdbc:mysql://localhost/test?cachePrepStmts=true&useServerPrepStmts=true&rewriteBatchedStatements=true")});
         dataSourceAdapters.add(new DataSourceAdapter[] { new PostgreSqlDataSourceAdapter("postgres", "admin", "jdbc:postgresql://localhost/postgres")});
         return dataSourceAdapters;
     }

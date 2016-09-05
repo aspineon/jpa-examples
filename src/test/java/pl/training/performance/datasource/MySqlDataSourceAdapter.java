@@ -3,6 +3,9 @@ package pl.training.performance.datasource;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class MySqlDataSourceAdapter extends DataSourceAdapter {
 
@@ -17,6 +20,13 @@ public class MySqlDataSourceAdapter extends DataSourceAdapter {
         dataSource.setUser(username);
         dataSource.setPassword(password);
         return dataSource;
+    }
+
+    @Override
+    public void createSchema(Connection connection) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.executeUpdate("drop table if exists post cascade");
+        statement.executeUpdate("create table post (id bigint not null, title varchar(255), version integer not null, primary key (id))");
     }
 
 }

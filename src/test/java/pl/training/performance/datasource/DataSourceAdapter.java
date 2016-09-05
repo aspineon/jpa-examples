@@ -1,6 +1,8 @@
 package pl.training.performance.datasource;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public abstract class DataSourceAdapter {
 
@@ -15,6 +17,8 @@ public abstract class DataSourceAdapter {
     }
 
     public abstract DataSource getDataSource();
+
+    public abstract void createSchema(Connection connection) throws SQLException;
 
     public String getUsername() {
         return username;
