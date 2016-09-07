@@ -1,11 +1,15 @@
 package pl.training.performance.entity;
 
+import org.hibernate.annotations.*;
 import sun.dc.pr.PRError;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import java.util.ArrayList;
 import java.util.List;
 
+@org.hibernate.annotations.Cache(region = "training", usage = CacheConcurrencyStrategy.READ_WRITE)
 @Entity
 public class Post {
 

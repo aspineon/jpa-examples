@@ -1,7 +1,9 @@
 package pl.training.performance.jpa;
 
 import com.codahale.metrics.Timer;
+import org.hibernate.SessionFactory;
 import org.hibernate.jpa.QueryHints;
+import org.hibernate.stat.Statistics;
 import org.junit.Test;
 import pl.training.performance.AbstractPerformanceTest;
 import pl.training.performance.datasource.DataSourceAdapter;
@@ -9,6 +11,7 @@ import pl.training.performance.entity.Post;
 import pl.training.performance.entity.PostComment;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.QueryHint;
 import java.sql.Connection;
@@ -26,6 +29,40 @@ public class InsertTest extends AbstractPerformanceTest {
     public InsertTest(DataSourceAdapter dataSourceAdapter) {
         super(dataSourceAdapter);
     }
+
+    @Test
+    public void testCache() {
+        EntityManagerFactory entityManagerFactory = createEntityManagerFactory();
+
+        EntityManager entityManager = entityManagerFactory .createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+        SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
+        Statistics statistics = sessionFactory.getStatistics();
+        statistics.setStatisticsEnabled(true);
+        printStats(statistics);
+        Post post = new Post("aa", "aa");
+        entityManager.persist(post);
+        printStats(statistics);
+        transaction.commit();
+        entityManager.close();
+
+        entityManager = entityManagerFactory .createEntityManager();
+        Post post2 = entityManager.find(Post.class, post.getId());
+        System.out.println(post.getId());
+        printStats(statistics);
+        entityManager.close();
+
+    }
+
+    public void printStats(Statistics statistics) {
+        System.out.println("Fetch count: " + statistics.getEntityFetchCount());
+        System.out.println("2 level cache hit count: " + statistics.getSecondLevelCacheHitCount());
+        System.out.println("2 level cache miss count: " + statistics.getSecondLevelCacheMissCount());
+        System.out.println("2 level cache put count: " + statistics.getSecondLevelCachePutCount());
+    }
+
+
 
     @Test
     public void testRelations() {
