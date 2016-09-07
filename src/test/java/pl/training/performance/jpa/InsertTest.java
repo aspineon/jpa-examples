@@ -1,16 +1,20 @@
 package pl.training.performance.jpa;
 
 import com.codahale.metrics.Timer;
+import org.hibernate.jpa.QueryHints;
 import org.junit.Test;
 import pl.training.performance.AbstractPerformanceTest;
 import pl.training.performance.datasource.DataSourceAdapter;
 import pl.training.performance.entity.Post;
+import pl.training.performance.entity.PostComment;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.QueryHint;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -21,6 +25,50 @@ public class InsertTest extends AbstractPerformanceTest {
 
     public InsertTest(DataSourceAdapter dataSourceAdapter) {
         super(dataSourceAdapter);
+    }
+
+    @Test
+    public void testRelations() {
+        Post post = new Post("Test title", "Test text");
+        PostComment postComment = new PostComment();
+        postComment.setText("Comment");
+        post.getComments().add(postComment);
+        postComment.setPost(post);
+        EntityManager entityManager = createEntityManagerFactory().createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+        entityManager.persist(post);
+        transaction.commit();
+        entityManager.close();
+
+        entityManager = createEntityManagerFactory().createEntityManager();
+        List<PostComment> postComments = entityManager
+                .createQuery("select pc from PostComment pc join fetch pc.post p", PostComment.class)
+                .getResultList();
+        postComments.forEach(comment -> System.out.println(comment.getPost().getTitle()));
+
+        entityManager.close();
+
+//        // left outer join
+//        entityManager = createEntityManagerFactory().createEntityManager();
+//        PostComment pc = entityManager.find(PostComment.class, postComment.getId());
+//        System.out.println("#####################################");
+//        pc.getPost().getText();
+//        entityManager.close();
+//
+//        // select
+//        entityManager = createEntityManagerFactory().createEntityManager();
+//        entityManager.createQuery("select pc from PostComment pc where pc.id = :id")
+//                .setParameter("id", postComment.getId())
+//                .getSingleResult();
+//        entityManager.close();
+//
+//        // join
+//        entityManager = createEntityManagerFactory().createEntityManager();
+//        entityManager.createQuery("select pc from PostComment pc join fetch pc.post p where pc.id = :id")
+//                .setParameter("id", postComment.getId())
+//                .getSingleResult();
+//        entityManager.close();
     }
 
     @Test

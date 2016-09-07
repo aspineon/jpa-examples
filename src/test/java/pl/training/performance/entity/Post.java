@@ -9,6 +9,7 @@ import java.util.List;
 @Entity
 public class Post {
 
+    @GeneratedValue
     @Id
     private Long id;
     private String title;
