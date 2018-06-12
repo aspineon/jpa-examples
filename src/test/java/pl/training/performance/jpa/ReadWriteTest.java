@@ -1,6 +1,7 @@
 package pl.training.performance.jpa;
 
 import com.codahale.metrics.Timer;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import pl.training.performance.util.PerformanceTest;
@@ -8,9 +9,8 @@ import pl.training.performance.util.datasource.DataSourceAdapter;
 import pl.training.performance.entity.Post;
 import pl.training.performance.entity.PostComment;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.FlushModeType;
+import javax.persistence.*;
+import javax.persistence.criteria.*;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -34,6 +34,33 @@ public class ReadWriteTest extends PerformanceTest {
         post.getComments().add(postComment);
         postComment.setPost(post);
         withEntityManager(entityManager -> entityManager.persist(post));
+    }
+
+    @After
+    public void onClose() {
+        entityManagerFactory.close();
+    }
+
+    @Test
+    public void testCriteria() {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
+
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> query = criteriaBuilder.createQuery(Tuple.class);
+        Root<Post> posts = query.from(Post.class);
+
+        Join<Post, PostComment> comments = posts.join("comments", JoinType.LEFT);
+
+        query.multiselect(posts.get("id"), posts.get("text").alias("text"), comments.get("text"))
+                .where(criteriaBuilder.equal(posts.get("id"), 1L));
+
+        List<Tuple> results = entityManager.createQuery(query).getResultList();
+        results.forEach(tuple -> System.out.println(tuple.get(0) + " " + tuple.get("text") + " " + tuple.get(2)));
+
+        transaction.commit();
+        entityManager.close();
     }
 
     @Test

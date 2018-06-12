@@ -2,7 +2,6 @@ package pl.training.performance.jpa;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import pl.training.performance.entity.Post;
 
 import javax.persistence.EntityManager;
