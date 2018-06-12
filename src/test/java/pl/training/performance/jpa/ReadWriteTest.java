@@ -1,6 +1,7 @@
 package pl.training.performance.jpa;
 
 import com.codahale.metrics.Timer;
+import org.junit.Before;
 import org.junit.Test;
 import pl.training.performance.util.PerformanceTest;
 import pl.training.performance.util.datasource.DataSourceAdapter;
@@ -9,38 +10,60 @@ import pl.training.performance.entity.PostComment;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.FlushModeType;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class ReadWriteTest extends PerformanceTest {
 
     private static final int SAMPLE_SIZE = 10_000;
+    private static final int SIMULATED_USERS = 2;
 
     public ReadWriteTest(DataSourceAdapter dataSourceAdapter) {
         super(dataSourceAdapter);
     }
 
-    @Test
-    public void testQuery() {
+    @Before
+    public void setup() {
         Post post = new Post("Test title", "Test text");
         PostComment postComment = new PostComment();
         postComment.setText("Comment");
         post.getComments().add(postComment);
         postComment.setPost(post);
         withEntityManager(entityManager -> entityManager.persist(post));
+    }
 
+    @Test
+    public void testLocks() throws InterruptedException {
+        CountDownLatch countDownLatch = new CountDownLatch(SIMULATED_USERS);
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(SIMULATED_USERS);
+
+        for (int i = 0; i < SIMULATED_USERS; i++) {
+            Task task = new Task(countDownLatch, entityManagerFactory.createEntityManager());
+            executor.submit(task);
+        }
+
+        countDownLatch.await();
+        System.out.println("All users finished");
+    }
+
+    @Test
+    public void testQuery() {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         Timer timer = metricRegistry.timer(dataSourceAdapter.getClass().getSimpleName());
         long startTime = System.nanoTime();
 
         List<PostComment> postComments = entityManager
-                .createQuery("select pc from PostComment pc join fetch pc.post p", PostComment.class)
+                .createQuery("select pc from PostComment pc join pc.post p", PostComment.class)
                 .getResultList();
+
         postComments.forEach(comment -> System.out.println(comment.getPost().getTitle()));
 
         timer.update(System.nanoTime() - startTime, TimeUnit.NANOSECONDS);
         reporter.report();
-
         entityManager.close();
 
 //        // left outer join

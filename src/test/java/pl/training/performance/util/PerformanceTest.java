@@ -30,7 +30,7 @@ public abstract class PerformanceTest {
             .outputTo(LoggerFactory.getLogger(getClass()))
             .build();
 
-    protected EntityManagerFactory entityManagerFactory = createEntityManagerFactory();
+    protected EntityManagerFactory entityManagerFactory;
 
     @Parameters
     public static Collection<DataSourceAdapter[]> dataSourceProviders() {
@@ -41,6 +41,7 @@ public abstract class PerformanceTest {
 
     public PerformanceTest(DataSourceAdapter dataSourceAdapter) {
         this.dataSourceAdapter = dataSourceAdapter;
+        entityManagerFactory = createEntityManagerFactory();
     }
 
     protected EntityManagerFactory createEntityManagerFactory() {

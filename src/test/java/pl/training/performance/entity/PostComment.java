@@ -18,7 +18,6 @@ public class PostComment {
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     private Post post;
-    @Lob
     private String text;
 
 }

@@ -21,7 +21,6 @@ public class Post {
     @NonNull
     private String title;
     @NonNull
-    @Lob
     private String text;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "post")
     private List<PostComment> comments = new ArrayList<>();
@@ -29,5 +28,7 @@ public class Post {
     private PostDetails postDetails;
     @ManyToMany
     private List<Tag> tags = new ArrayList<>();
+    //@Version
+    //private long version;
 
 }
