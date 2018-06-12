@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.LoggerFactory;
+import pl.training.performance.jpa.UserTask;
 import pl.training.performance.util.datasource.DataSourceAdapter;
 import pl.training.performance.util.datasource.PostgreSqlDataSourceAdapter;
 
@@ -18,6 +19,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 
 @RunWith(Parameterized.class)
@@ -41,14 +45,10 @@ public abstract class PerformanceTest {
 
     public PerformanceTest(DataSourceAdapter dataSourceAdapter) {
         this.dataSourceAdapter = dataSourceAdapter;
-        entityManagerFactory = createEntityManagerFactory();
+        entityManagerFactory = Persistence.createEntityManagerFactory("training", dataSourceAdapter.getJpaProperties());
     }
 
-    protected EntityManagerFactory createEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory("training", dataSourceAdapter.getJpaProperties());
-    }
-
-    protected void withTransaction(Consumer<Connection> task) throws SQLException {
+    protected void withConnection(Consumer<Connection> task) throws SQLException {
         Connection acquiredConnection = null;
         try (Connection connection = dataSourceAdapter.getDataSource().getConnection()) {
             connection.setAutoCommit(false);
@@ -56,7 +56,9 @@ public abstract class PerformanceTest {
             task.accept(connection);
             connection.commit();
         } catch (Exception ex) {
-            acquiredConnection.rollback();
+            if (acquiredConnection != null) {
+                acquiredConnection.rollback();
+            }
         }
     }
 
@@ -67,6 +69,19 @@ public abstract class PerformanceTest {
         task.accept(entityManager);
         transaction.commit();
         entityManager.close();
+    }
+
+    protected void withSimulatedUsers(UserTask... tasks) throws InterruptedException {
+        int simulatedUsers = tasks.length;
+        CountDownLatch countDownLatch = new CountDownLatch(simulatedUsers);
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(simulatedUsers);
+        for (UserTask task : tasks) {
+            task.setCountDownLatch(countDownLatch);
+            task.setEntityManager(entityManagerFactory.createEntityManager());
+            executor.submit(task);
+        }
+        countDownLatch.await();
+        System.out.println("All users finished");
     }
 
 }

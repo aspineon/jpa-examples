@@ -1,7 +1,6 @@
 package pl.training.performance.jpa;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import pl.training.performance.entity.Post;
 
 import javax.persistence.EntityManager;
@@ -10,12 +9,11 @@ import javax.persistence.LockModeType;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
-@RequiredArgsConstructor
-public class Task implements Runnable {
+public class UpdatePost implements UserTask {
 
-    @NonNull
+    @Setter
     private CountDownLatch countDownLatch;
-    @NonNull
+    @Setter
     private EntityManager entityManager;
     private Random random = new Random();
 

@@ -15,9 +15,6 @@ import java.util.Map;
 @AllArgsConstructor
 public abstract class DataSourceAdapter {
 
-    private static final int MAX_POOL_SIZE = 50;
-    private static final long IDLE_TIMEOUT = 5000;
-
     String username;
     String password;
     String url;
@@ -42,8 +39,6 @@ public abstract class DataSourceAdapter {
         hikariConfig.setJdbcUrl(url);
         hikariConfig.setUsername(username);
         hikariConfig.setPassword(password);
-        hikariConfig.setMaximumPoolSize(MAX_POOL_SIZE);
-        hikariConfig.setIdleTimeout(IDLE_TIMEOUT);
         return new HikariDataSource(hikariConfig);
     }
 

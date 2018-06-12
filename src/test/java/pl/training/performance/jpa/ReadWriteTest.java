@@ -12,15 +12,11 @@ import pl.training.performance.entity.PostComment;
 import javax.persistence.*;
 import javax.persistence.criteria.*;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class ReadWriteTest extends PerformanceTest {
 
     private static final int SAMPLE_SIZE = 10_000;
-    private static final int SIMULATED_USERS = 2;
 
     public ReadWriteTest(DataSourceAdapter dataSourceAdapter) {
         super(dataSourceAdapter);
@@ -65,16 +61,7 @@ public class ReadWriteTest extends PerformanceTest {
 
     @Test
     public void testLocks() throws InterruptedException {
-        CountDownLatch countDownLatch = new CountDownLatch(SIMULATED_USERS);
-        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(SIMULATED_USERS);
-
-        for (int i = 0; i < SIMULATED_USERS; i++) {
-            Task task = new Task(countDownLatch, entityManagerFactory.createEntityManager());
-            executor.submit(task);
-        }
-
-        countDownLatch.await();
-        System.out.println("All users finished");
+        withSimulatedUsers(new UpdatePost(), new UpdatePost());
     }
 
     @Test

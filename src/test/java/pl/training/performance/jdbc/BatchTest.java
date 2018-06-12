@@ -21,7 +21,7 @@ public class BatchTest extends PerformanceTest {
 
     @Test
     public void testInsertStatement() throws SQLException {
-        withTransaction(connection -> {
+        withConnection(connection -> {
             try {
                 dataSourceAdapter.createSchema(connection);
                 Statement statement = connection.createStatement();
@@ -47,7 +47,7 @@ public class BatchTest extends PerformanceTest {
 
     @Test
     public void testInsertPreparedStatement() throws SQLException {
-        withTransaction(connection -> {
+        withConnection(connection -> {
             try {
                 dataSourceAdapter.createSchema(connection);
                 PreparedStatement statement = connection.prepareStatement("insert into post (id, title, version) values (?, ?, 0)");
