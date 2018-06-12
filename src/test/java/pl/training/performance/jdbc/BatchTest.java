@@ -2,17 +2,15 @@ package pl.training.performance.jdbc;
 
 import com.codahale.metrics.Timer;
 import org.junit.Test;
-import pl.training.performance.AbstractPerformanceTest;
-import pl.training.performance.datasource.DataSourceAdapter;
+import pl.training.performance.util.PerformanceTest;
+import pl.training.performance.util.datasource.DataSourceAdapter;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
-public class BatchTest extends AbstractPerformanceTest {
+public class BatchTest extends PerformanceTest {
 
     private static final int SAMPLE_SIZE = 10_000;
     private static final int BATCH_SIZE = 50;
@@ -23,7 +21,7 @@ public class BatchTest extends AbstractPerformanceTest {
 
     @Test
     public void testInsertStatement() throws SQLException {
-        inTransaction(connection -> {
+        withTransaction(connection -> {
             try {
                 dataSourceAdapter.createSchema(connection);
                 Statement statement = connection.createStatement();
@@ -49,7 +47,7 @@ public class BatchTest extends AbstractPerformanceTest {
 
     @Test
     public void testInsertPreparedStatement() throws SQLException {
-        inTransaction(connection -> {
+        withTransaction(connection -> {
             try {
                 dataSourceAdapter.createSchema(connection);
                 PreparedStatement statement = connection.prepareStatement("insert into post (id, title, version) values (?, ?, 0)");
@@ -72,18 +70,6 @@ public class BatchTest extends AbstractPerformanceTest {
                 ex.printStackTrace();
             }
         });
-    }
-
-    public void inTransaction(Consumer<Connection> callback) throws SQLException {
-        Connection aquiredConnection = null;
-        try (Connection connection = dataSourceAdapter.getDataSource().getConnection()) {
-            connection.setAutoCommit(false);
-            aquiredConnection = connection;
-            callback.accept(connection);
-            connection.commit();
-        } catch (Exception ex) {
-            aquiredConnection.rollback();
-        }
     }
 
 }

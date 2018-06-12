@@ -1,9 +1,16 @@
 package pl.training.performance.entity;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import javax.persistence.*;
 
 @Table(name = "post_comment")
 @Entity
+@EqualsAndHashCode(exclude = "post")
+@ToString(exclude = "post")
+@Data
 public class PostComment {
 
     @GeneratedValue
@@ -13,29 +20,5 @@ public class PostComment {
     private Post post;
     @Lob
     private String text;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Post getPost() {
-        return post;
-    }
-
-    public void setPost(Post post) {
-        this.post = post;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
 
 }

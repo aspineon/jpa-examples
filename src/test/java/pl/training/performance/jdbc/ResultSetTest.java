@@ -2,8 +2,8 @@ package pl.training.performance.jdbc;
 
 import com.codahale.metrics.Timer;
 import org.junit.Test;
-import pl.training.performance.AbstractPerformanceTest;
-import pl.training.performance.datasource.DataSourceAdapter;
+import pl.training.performance.util.PerformanceTest;
+import pl.training.performance.util.datasource.DataSourceAdapter;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.TimeUnit;
 
-public class ResultSetTest extends AbstractPerformanceTest {
+public class ResultSetTest extends PerformanceTest {
 
     public ResultSetTest(DataSourceAdapter dataSourceAdapter) {
         super(dataSourceAdapter);

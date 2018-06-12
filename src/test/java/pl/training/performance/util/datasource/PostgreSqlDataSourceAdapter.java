@@ -1,23 +1,23 @@
-package pl.training.performance.datasource;
+package pl.training.performance.util.datasource;
 
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
-import org.hibernate.dialect.MySQL5Dialect;
+import org.hibernate.dialect.PostgreSQL9Dialect;
+import org.postgresql.ds.PGSimpleDataSource;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class MySqlDataSourceAdapter extends DataSourceAdapter {
+public class PostgreSqlDataSourceAdapter extends DataSourceAdapter {
 
-    public MySqlDataSourceAdapter(String username, String password, String url) {
+    public PostgreSqlDataSourceAdapter(String username, String password, String url) {
         super(username, password, url);
     }
 
     @Override
     public DataSource getDataSource() {
-        MysqlDataSource dataSource = new MysqlDataSource();
-        dataSource.setURL(url);
+        PGSimpleDataSource dataSource = new PGSimpleDataSource();
+        dataSource.setUrl(url);
         dataSource.setUser(username);
         dataSource.setPassword(password);
         return dataSource;
@@ -32,7 +32,7 @@ public class MySqlDataSourceAdapter extends DataSourceAdapter {
 
     @Override
     public String getDialect() {
-        return MySQL5Dialect.class.getName();
+        return PostgreSQL9Dialect.class.getName();
     }
 
 }

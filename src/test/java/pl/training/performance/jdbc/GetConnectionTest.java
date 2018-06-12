@@ -2,15 +2,15 @@ package pl.training.performance.jdbc;
 
 import com.codahale.metrics.Timer;
 import org.junit.Test;
-import pl.training.performance.AbstractPerformanceTest;
-import pl.training.performance.datasource.DataSourceAdapter;
+import pl.training.performance.util.PerformanceTest;
+import pl.training.performance.util.datasource.DataSourceAdapter;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
-public class GetConnectionTest extends AbstractPerformanceTest {
+public class GetConnectionTest extends PerformanceTest {
 
     private static final int SAMPLE_SIZE = 1_000;
 
@@ -25,7 +25,7 @@ public class GetConnectionTest extends AbstractPerformanceTest {
 
     @Test
     public void testGetConnectionWithPolling() throws SQLException {
-        testGetConnection(getHikariDataSource());
+        testGetConnection(dataSourceAdapter.getPolledDataSource());
     }
 
     private void testGetConnection(DataSource dataSource) throws SQLException {
