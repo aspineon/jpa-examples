@@ -47,7 +47,6 @@ public class ReadWriteTest extends PerformanceTest {
             Statistics statistics = sessionFactory.getStatistics();
             statistics.setStatisticsEnabled(true);
             printStats(statistics);
-
         });
     }
 
