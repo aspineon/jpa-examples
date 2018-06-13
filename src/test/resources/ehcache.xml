@@ -12,7 +12,7 @@
         <persistence strategy="localTempSwap"/>
     </defaultCache>
 
-    <cache name="training" maxEntriesLocalHeap="10000" eternal="false"
+    <cache name="training" maxEntriesLocalHeap="10000" eternal="false" statistics="true"
            timeToIdleSeconds="5" timeToLiveSeconds="10">
         <persistence strategy="localTempSwap"/>
     </cache>

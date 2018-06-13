@@ -14,7 +14,9 @@ import pl.training.performance.entity.PostComment;
 
 import javax.persistence.*;
 import javax.persistence.criteria.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class ReadWriteTest extends PerformanceTest {
@@ -42,11 +44,24 @@ public class ReadWriteTest extends PerformanceTest {
 
     @Test
     public void testCache() {
+        SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
+        Statistics statistics = sessionFactory.getStatistics();
+        statistics.setStatisticsEnabled(true);
+
         withEntityManager(entityManager -> {
-            SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
-            Statistics statistics = sessionFactory.getStatistics();
-            statistics.setStatisticsEnabled(true);
+            entityManager.find(Post.class, 1L);
+            entityManager.find(Post.class, 2L);
             printStats(statistics);
+        });
+        withEntityManager(entityManager -> {
+            Map<String, Object> props = new HashMap<>();
+            props.put("javax.persistence.cache.retrieveMode", CacheRetrieveMode.BYPASS);
+            entityManager.find(Post.class, 1L, props);
+            printStats(statistics);
+        });
+        withEntityManager(entityManager -> {
+            Cache cache = entityManagerFactory.getCache();
+            cache.evictAll();
         });
     }
 

@@ -4,11 +4,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@org.hibernate.annotations.Cache(region = "training", usage = CacheConcurrencyStrategy.READ_WRITE)
 @Entity
 @RequiredArgsConstructor
 @NoArgsConstructor
