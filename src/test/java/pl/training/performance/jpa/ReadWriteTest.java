@@ -1,9 +1,12 @@
 package pl.training.performance.jpa;
 
 import com.codahale.metrics.Timer;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.terracotta.statistics.Statistic;
 import pl.training.performance.util.PerformanceTest;
 import pl.training.performance.util.datasource.DataSourceAdapter;
 import pl.training.performance.entity.Post;
@@ -35,6 +38,24 @@ public class ReadWriteTest extends PerformanceTest {
     @After
     public void onClose() {
         entityManagerFactory.close();
+    }
+
+    @Test
+    public void testCache() {
+        withEntityManager(entityManager -> {
+            SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
+            Statistics statistics = sessionFactory.getStatistics();
+            statistics.setStatisticsEnabled(true);
+            printStats(statistics);
+
+        });
+    }
+
+    private void printStats(Statistics statistics) {
+        System.out.println("Fetch count: " + statistics.getEntityFetchCount());
+        System.out.println("2 level cache hit count: " + statistics.getSecondLevelCacheHitCount());
+        System.out.println("2 level cache miss count: " + statistics.getSecondLevelCacheMissCount());
+        System.out.println("2 level cache put count: " + statistics.getSecondLevelCachePutCount());
     }
 
     @Test
