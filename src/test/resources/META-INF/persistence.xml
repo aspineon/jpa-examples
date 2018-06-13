@@ -4,15 +4,21 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <properties>
             <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
-
-            <property name="hibernate.show_sql" value="false"/>
+            <!--<property name="hibernate.jdbc.batch_size" value="10"/>-->
+            <!--<property name="hibernate.order_inserts" value="true"/>-->
+            <!--<property name="hibernate.order_updates" value="true"/>-->
+            <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
-
+            <!--<property name="hibernate.c3p0.max_size" value="10"/>-->
             <property name="hibernate.connection.provider_class" value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
             <property name="hibernate.hikari.minimumIdle" value="5"/>
             <property name="hibernate.hikari.maximumPoolSize" value="10"/>
             <property name="hibernate.hikari.idleTimeout" value="30000"/>
             <!--<property name="hibernate.connection.release_mode" value="after_transaction"/>-->
-         </properties>
+            <property name="hibernate.cache.use_second_level_cache" value="true"/>
+            <property name="hibernate.cache.use_query_cache" value="true"/>
+            <property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.EhCacheRegionFactory"/>
+            <property name="net.sf.ehcache.configurationResourceName" value="ehcache.xml"/>
+        </properties>
     </persistence-unit>
 </persistence>
