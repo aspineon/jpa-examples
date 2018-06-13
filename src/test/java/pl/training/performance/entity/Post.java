@@ -31,4 +31,9 @@ public class Post {
     //@Version
     //private long version;
 
+    @PostPersist
+    public void onPersist() {
+        System.out.println("Post persisted");
+    }
+
 }
